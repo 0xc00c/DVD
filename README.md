@@ -17,3 +17,23 @@ For Q&A and troubleshooting running Damn Vulnerable DeFi, go [here](https://gith
 All Solidity code, practices and patterns in this repository are DAMN VULNERABLE and for educational purposes only.
 
 DO NOT USE IN PRODUCTION.
+
+## Progress
+
+This repo contains the solutions I found so far. Clone the original repo if you want to play.
+
+- [x] Unstoppable
+- [x] Naive receiver
+- [ ] Truster
+- [x] Side entrance
+- [ ] The Rewarder
+- [ ] Selfie
+- [ ] Compromised
+- [ ] Puppet
+- [ ] Puppet V2
+- [ ] Free rider
+- [ ] Backdoor
+- [ ] Climber
+- [ ] Wallet Mining
+- [ ] Puppet V3
+- [ ] ABI Smuggling
