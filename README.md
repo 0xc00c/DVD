@@ -27,7 +27,7 @@ This repo contains the solutions I found so far. Clone the original repo if you 
 - [ ] Truster
 - [x] Side entrance
 - [ ] The Rewarder
-- [ ] Selfie
+- [x] Selfie
 - [ ] Compromised
 - [ ] Puppet
 - [ ] Puppet V2
