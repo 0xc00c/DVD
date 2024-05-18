@@ -26,7 +26,7 @@ This repo contains the solutions I found so far. Clone the original repo if you 
 - [x] Naive receiver
 - [x] Truster
 - [x] Side entrance
-- [ ] The Rewarder
+- [x] The Rewarder
 - [x] Selfie
 - [ ] Compromised
 - [ ] Puppet
