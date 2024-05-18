@@ -23,6 +23,11 @@ describe('[Challenge] Truster', function () {
 
     it('Execution', async function () {
         /** CODE YOUR SOLUTION HERE */
+        /*
+         * We notice a vulnerability in the contract, at the callback of the flashloan.
+         * We can use it to approve the tokens to be spent by the attacker contract.
+         * Then, we transfer the tokens to player.
+         */
         const attackContract = await ethers.getContractFactory('TrusterAttacker', player);
         const attacker = await attackContract.deploy(token.address, pool.address);
         await attacker.connect(player).attack(TOKENS_IN_POOL);
