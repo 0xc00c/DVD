@@ -30,7 +30,7 @@ This repo contains the solutions I found so far. Clone the original repo if you 
 - [x] Selfie
 - [x] Compromised
 - [x] Puppet
-- [ ] Puppet V2
+- [x] Puppet V2
 - [ ] Free rider
 - [ ] Backdoor
 - [ ] Climber
