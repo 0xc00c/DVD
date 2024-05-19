@@ -28,7 +28,7 @@ This repo contains the solutions I found so far. Clone the original repo if you 
 - [x] Side entrance
 - [x] The Rewarder
 - [x] Selfie
-- [ ] Compromised
+- [x] Compromised
 - [ ] Puppet
 - [ ] Puppet V2
 - [ ] Free rider
