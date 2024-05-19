@@ -29,7 +29,7 @@ This repo contains the solutions I found so far. Clone the original repo if you 
 - [x] The Rewarder
 - [x] Selfie
 - [x] Compromised
-- [ ] Puppet
+- [x] Puppet
 - [ ] Puppet V2
 - [ ] Free rider
 - [ ] Backdoor
