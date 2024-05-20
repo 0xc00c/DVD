@@ -31,7 +31,7 @@ This repo contains the solutions I found so far. Clone the original repo if you 
 - [x] Compromised
 - [x] Puppet
 - [x] Puppet V2
-- [ ] Free rider
+- [x] Free rider
 - [ ] Backdoor
 - [ ] Climber
 - [ ] Wallet Mining
